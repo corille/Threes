@@ -1,35 +1,19 @@
 # -*- coding: utf-8 -*-
 
-"""
-ZetCode PyQt4 tutorial 
-
-This example shows a tooltip on 
-a window and a button
-
-author: Jan Bodnar
-website: zetcode.com 
-last edited: October 2011
-"""
-
 import random
 def shift(row):
-    for i in range(1,N):
-        if row[i-1] == 0:
-            row.pop(i-1)
+    for i in range(N-1):
+        if row[i] == 0:
             break
-        
-        if row[i-1] == row[i] and row[i] > 2:
-            row[i] *= 2
-            row.pop(i-1)
+        if row[i] == row[i+1] and row[i] > 2:
+            row[i+1] *= 2
             break
-        
-        if row[i-1]*row[i] == 2: # a pair of 1 and 2:
-            row[i] = 3
-            row.pop(i-1)
+        if row[i]*row[i+1] == 2: # a pair of 1 and 2:
+            row[i+1] = 3
             break
-
     else:
         return False
+    row.pop(i)
     row.append(0)
     return True
 
