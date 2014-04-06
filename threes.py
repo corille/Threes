@@ -14,17 +14,21 @@ class Threes(QtGui.QMainWindow):
         super(Threes, self).__init__()
         
         self.initUI()
+        
     
     def initUI(self):
         
         self.board = Board(self)
         self.setCentralWidget(self.board)
-        
-        self.board.start()
-        
-        self.resize(400,600)
+      
+
+        size = QtCore.QSize(420,620)
+        self.resize(size)
+        self.setFixedSize(size)
         self.setWindowTitle('Threes?')
+        self.board.start()
         self.show()
+        
         
 class Board(QtGui.QFrame):
     N_Rows = 4
@@ -41,6 +45,9 @@ class Board(QtGui.QFrame):
         self.tiles=[]
         self.maxTile = 3
         
+
+
+        
     def clearBoard(self):
         self.tiles = [[0 for c in range(Board.N_Cols)] for r in range(Board.N_Rows)]
         self.tiles[0][0]=1
@@ -50,6 +57,7 @@ class Board(QtGui.QFrame):
     def start(self):
         self.clearBoard()
         self.timer.start(300,self)
+
 
     def keyPressEvent(self, event):
         
@@ -68,7 +76,8 @@ class Board(QtGui.QFrame):
             self.slideUp()
         else:
             super(Board, self).keyPressEvent(event)
-        self.displayBoard() 
+
+        self.update()
             
     def slideLeft(self):
         rows_moved = []
@@ -140,11 +149,29 @@ class Board(QtGui.QFrame):
     def getRandomTile(self):
         # ignore larger bonus tiles for now
         return(randint(1,4))
+
+    def paintEvent(self, event):
+        painter = QtGui.QPainter(self)
+        rect = self.contentsRect()
+        
+        for row in range(Board.N_Rows):
+            for col in range(Board.N_Cols):
+                if self.tiles[row][col] != 0:
+                    self.drawTile(painter,col*100,row*150,self.tiles[row][col])
+        
+        
     
-    def displayBoard(self):
-        for row in self.tiles:
-            print(row)
-        print(' ')
+    def drawTile(self, painter, x, y, value):
+        color = QtGui.QColor(0xaaaaaa)
+        
+        rect = QtCore.QRectF(x+2,y+2,100-2,150-2)
+        painter.fillRect(rect, color)
+        
+        painter.setPen(QtGui.QColor(168, 34, 3))
+        painter.setFont(QtGui.QFont('Calibri', 40))
+        painter.drawText(rect, QtCore.Qt.AlignCenter, str(value))
+
+
     
        
 def main():
