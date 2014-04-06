@@ -27,21 +27,24 @@ class Threes(QtGui.QMainWindow):
         self.show()
         
 class Board(QtGui.QFrame):
-    
+    N_Rows = 4
+    N_Cols = 4
     def __init__(self, parent):
         super(Board, self).__init__(parent)
-        print('Board init')
         self.initBoard()
 
     def initBoard(self):     
 
         self.timer = QtCore.QBasicTimer()
         self.setFocusPolicy(QtCore.Qt.StrongFocus)
-        print('Board created')
         
+        self.tiles=[]
+        
+    def clearBoard(self):
+        self.tiles = [[0 for c in range(Board.N_Cols)] for r in range(Board.N_Rows)]
+
     def start(self):
-        print('Started')
-        
+        self.clearBoard()
         self.timer.start(100,self)
 
     def keyPressEvent(self, event):
@@ -63,14 +66,14 @@ class Board(QtGui.QFrame):
            
         else:
             super(Board, self).keyPressEvent(event)
-
-class Tile(object):
     
-    def __init__(self):
-        
-        self.x = 0
-        self.y = 0
-        
+    def displayBoard(self):
+        for row in self.tiles: print(row)
+    
+    def shiftBoard(self, direction):
+        pass
+
+       
 def main():
     
     app = QtGui.QApplication([])
