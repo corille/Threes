@@ -71,37 +71,57 @@ class Board(QtGui.QFrame):
         self.displayBoard() 
             
     def slideLeft(self):
-        result = []
-        for row in self.tiles:
-            result.append(self.shift(row,Board.N_Cols))
+        rows_moved = []
+        for i,row in enumerate(self.tiles):
+            if self.shift(row,Board.N_Cols):
+                rows_moved.append(i)
+        if len(rows_moved) == 0:
+            return
+        self.tiles[random.choice(rows_moved)][-1] = self.getRandomTile()
+
+
+            
     
     def slideRight(self):
-        result = []
-        for row in self.tiles:
+        rows_moved = []
+        for i,row in enumerate(self.tiles):
             row.reverse()
-            result.append(self.shift(row,Board.N_Cols))
+            if self.shift(row,Board.N_Cols):
+                rows_moved.append(i)
             row.reverse()
-
+        if len(rows_moved) == 0:
+            return
+        self.tiles[random.choice(rows_moved)][0] = self.getRandomTile()
+        
     def slideDown(self):
         tiles_transposed = [list(i) for i in zip(*self.tiles)]
-        result = []
-        for row in tiles_transposed:
+        rows_moved = []
+        for i,row in enumerate(tiles_transposed):
             row.reverse()
-            result.append(self.shift(row,Board.N_Rows))
+            if self.shift(row,Board.N_Rows):
+                rows_moved.append(i)
             row.reverse()
+        if len(rows_moved) == 0:
+            return
+        tiles_transposed[random.choice(rows_moved)][0] = self.getRandomTile()
         self.tiles = [list(i) for i in zip(*tiles_transposed)]
         
         
     def slideUp(self):
         tiles_transposed = [list(i) for i in zip(*self.tiles)]
-        result = []
-        for row in tiles_transposed:
-            result.append(self.shift(row,Board.N_Rows))
+        rows_moved = []
+        for i,row in enumerate(tiles_transposed):
+            if self.shift(row,Board.N_Rows):
+                rows_moved.append(i)
+        if len(rows_moved) == 0:
+            return
+        tiles_transposed[random.choice(rows_moved)][-1] = self.getRandomTile()
         self.tiles = [list(i) for i in zip(*tiles_transposed)]
+
             
     def shift(self,row,N):
         for i in range(N-1):
-            if row[i] == 0:
+            if row[i] == 0 and row[i+1] != 0: #empty rows don't shift
                 break
             if row[i] == row[i+1] and row[i] > 2:
                 row[i+1] *= 2
@@ -118,12 +138,13 @@ class Board(QtGui.QFrame):
         return True
     
     def getRandomTile(self):
-        pass
+        # ignore larger bonus tiles for now
+        return(randint(1,4))
     
     def displayBoard(self):
         for row in self.tiles:
             print(row)
-        print(self.maxTile)
+        print(' ')
     
        
 def main():
