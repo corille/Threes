@@ -22,7 +22,7 @@ class Threes(QtGui.QMainWindow):
         self.setCentralWidget(self.board)
       
 
-        size = QtCore.QSize(420,620)
+        size = QtCore.QSize(600,600)
         self.resize(size)
         self.setFixedSize(size)
         self.setWindowTitle('Threes?')
@@ -45,15 +45,19 @@ class Board(QtGui.QFrame):
         self.tiles=[]
         self.maxTile = 3
         
+        self.deck = Deck()
+        
 
 
         
     def clearBoard(self):
         self.tiles = [[0 for c in range(Board.N_Cols)] for r in range(Board.N_Rows)]
-        self.tiles[0][0]=1
-        self.tiles[0][2]=2
-        self.tiles[2][0]=3
-        self.tiles[2][1]=3
+        positions = random.sample([i for i in range(Board.N_Cols * Board.N_Rows)], 9)
+        
+        for p in positions:
+            self.tiles[p // Board.N_Cols][p % Board.N_Cols]=self.deck.getCard()
+            
+
     def start(self):
         self.clearBoard()
         self.timer.start(300,self)
@@ -148,7 +152,8 @@ class Board(QtGui.QFrame):
     
     def getRandomTile(self):
         # ignore larger bonus tiles for now
-        return(randint(1,4))
+        return self.deck.getCard(self.maxTile)
+
 
     def paintEvent(self, event):
         painter = QtGui.QPainter(self)
@@ -158,20 +163,49 @@ class Board(QtGui.QFrame):
             for col in range(Board.N_Cols):
                 if self.tiles[row][col] != 0:
                     self.drawTile(painter,col*100,row*150,self.tiles[row][col])
-        
+        self.drawTile(painter,450,200,self.deck.showNext(), showNumber = False)
         
     
-    def drawTile(self, painter, x, y, value):
-        color = QtGui.QColor(0xaaaaaa)
+    def drawTile(self, painter, x, y, value, showNumber = True):
+        if value == 1:
+            color = QtGui.QColor(0xccccff)
+        elif value == 2:
+            color = QtGui.QColor(0xffcccc)
+        else:
+            color = QtGui.QColor(0xcccccc)
         
         rect = QtCore.QRectF(x+2,y+2,100-2,150-2)
         painter.fillRect(rect, color)
         
         painter.setPen(QtGui.QColor(168, 34, 3))
         painter.setFont(QtGui.QFont('Calibri', 40))
-        painter.drawText(rect, QtCore.Qt.AlignCenter, str(value))
+        if showNumber:
+            painter.drawText(rect, QtCore.Qt.AlignCenter, str(value))
+        elif value > 3:
+            painter.drawText(rect, QtCore.Qt.AlignCenter, '+')
 
-
+class Deck(object):
+    def __init__(self):
+        self.cards = []
+        self.reshuffle()
+        
+    def getCard(self,maxTile = 3):
+        card = self.cards.pop()
+        if random.randint(0,20) == 0 and maxTile >= 48: # add bonus card to stack
+            bonusrank = int(log(maxTile/3)/log(2) - 3)
+            bonuscards = [3*2**(i+1) for i in range(bonusrank)]
+            self.cards.append(random.choice(bonuscards))
+        if len(self.cards) == 0:
+            self.reshuffle()
+        return card
+        
+    def reshuffle(self):
+        self.cards = [1,2,3]*4
+        random.shuffle(self.cards)
+        
+    def showNext(self):
+        return self.cards[-1]
+        
     
        
 def main():
