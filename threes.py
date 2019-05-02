@@ -192,9 +192,7 @@ class Deck(object):
     def getCard(self,maxTile = 3):
         card = self.cards.pop()
         if random.randint(0,20) == 0 and maxTile >= 48: # add bonus card to stack
-            bonusrank = int(log(maxTile/3)/log(2) - 3)
-            bonuscards = [3*2**(i+1) for i in range(bonusrank)]
-            self.cards.append(random.choice(bonuscards))
+            self.cards.append(self.getBonusCard(maxTile))
         if len(self.cards) == 0:
             self.reshuffle()
         return card
@@ -205,6 +203,14 @@ class Deck(object):
         
     def showNext(self):
         return self.cards[-1]
+    
+    def getBonusCard(self, maxTile):
+        maxPow2 = maxTile // 48
+        log2 = 0
+        while maxPow2 > 0:
+            log2 += 1
+            maxPow2 >>= 1
+        return 3 * pow(2, random.randint(1, log2))
         
     
        
